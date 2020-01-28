@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/Nico/CLionProjects/proj_1_automata/DFA.h
+
+C:/Users/Nico/CLionProjects/proj_1_automata/LinkedList.c
+stdio.h
+-
+stdlib.h
+-
+LinkedList.h
+C:/Users/Nico/CLionProjects/proj_1_automata/LinkedList.h
+
+C:/Users/Nico/CLionProjects/proj_1_automata/LinkedList.h
+stdbool.h
+-
+
+C:/Users/Nico/CLionProjects/proj_1_automata/NFA.h
+LinkedList.h
+C:/Users/Nico/CLionProjects/proj_1_automata/LinkedList.h
+
+C:/Users/Nico/CLionProjects/proj_1_automata/main.c
+stdio.h
+-
+string.h
+-
+stdbool.h
+-
+DFA.h
+C:/Users/Nico/CLionProjects/proj_1_automata/DFA.h
+LinkedList.c
+C:/Users/Nico/CLionProjects/proj_1_automata/LinkedList.c
+NFA.h
+C:/Users/Nico/CLionProjects/proj_1_automata/NFA.h
+
