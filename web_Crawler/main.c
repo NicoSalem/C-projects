@@ -50,6 +50,7 @@ char *socket_TCP_HTTP(char *server)
     strcat(request,host);
     strcat(request,server);
     strcat(request,close);
+
     printf("%s",request);
 
     char buffer[1000] = {0};
@@ -121,7 +122,6 @@ void get_a_tags(char *htmlpage)
         {
             if(htmlpage[c+1]=='a')
             {
-
                 char *a_tag = malloc(1);
                 strcpy(a_tag, "");
                 int n = 1;
@@ -141,16 +141,17 @@ void get_a_tags(char *htmlpage)
                         strcat(a_tag, cls);
                         keepGoing = false;
                     }
-                    n++;
-                    c++;
+                    n++; c++;
                 }
                 while(keepGoing);
 //                get_href(a_tag);
 //                printf("a tag: %s\n",a_tag);
                LinkedList_add_at_end(a_tags,a_tag);
+
             }
         }
     }
+//    free(a_tag);
 }
 
 void get_href(char *tag)
@@ -161,7 +162,6 @@ void get_href(char *tag)
 
     for(int co=0; co<strlen(tag);co++)
     {
-
         if(tag[co]=='h' && tag[co+1]=='r' && tag[co+2]=='e' && tag[co+3]=='f')
         {
 
@@ -175,9 +175,9 @@ void get_href(char *tag)
                 strcat(href, ch);
                 cc++;
             }
-
         }
     }
     //printf("href: %s\n",href);
     LinkedList_add_at_end(href_list,href);
+//    free(href);
 }
