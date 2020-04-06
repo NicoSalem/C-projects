@@ -7,14 +7,14 @@ LinkedList new_LinkedList()
     return this;
 }
 
-static Node new_Node(void *data) {
+static Node new_Node(char *data) {
     Node this = (Node)malloc(sizeof(struct Node));
     this->data = data;
     this->next = this->prev = NULL;
     return this;
 }
 
-void LinkedList_add_at_front(LinkedList this, void *data) {
+void LinkedList_add_at_front(LinkedList this, char *data) {
     Node node = new_Node(data);
     node->next = this->first;
     if (this->first != NULL) {
@@ -26,7 +26,7 @@ void LinkedList_add_at_front(LinkedList this, void *data) {
     }
 }
 
-void LinkedList_remove(LinkedList this, void *data) {
+void LinkedList_remove(LinkedList this, char *data) {
     for (Node node=this->first; node != NULL; node=node->next) {
         if (node->data == data) {
             if (node == this->first) {
@@ -59,14 +59,14 @@ void* LinkedList_elementAt(LinkedList this, int index) {
 }
 
 void* LinkedList_pop(LinkedList this) {
-    void *data = LinkedList_elementAt(this, 0);
+    char *data = LinkedList_elementAt(this, 0);
     if (data != NULL) {
         LinkedList_remove(this, data); // Removes first occurrence
     }
     return data;
 }
 
-void LinkedList_add_at_end(LinkedList this, void *data) {
+void LinkedList_add_at_end(LinkedList this, char *data) {
     Node node = new_Node(data);
     node->prev = this->last;
     if (this->last != NULL) {
@@ -78,7 +78,7 @@ void LinkedList_add_at_end(LinkedList this, void *data) {
     }
 }
 
-bool LinkedList_contains(const LinkedList this, void *data) {
+bool LinkedList_contains(const LinkedList this, char *data) {
     for (Node node=this->first; node != NULL; node=node->next) {
         if (node->data == data) {
             return true;

@@ -7,7 +7,7 @@ typedef struct LinkedList* LinkedList;
 
 struct Node
 {
-    void *data;
+    char *data;
     Node next;
     Node prev;
 };
@@ -20,11 +20,11 @@ struct LinkedList
 
 void print_List(LinkedList list);
 LinkedList new_LinkedList();
-static Node new_Node(void *data);
-void LinkedList_add_at_front(LinkedList this, void *data);
+static Node new_Node(char *data);
+void LinkedList_add_at_front(LinkedList this, char *data);
 void* LinkedList_pop(LinkedList this);
-void LinkedList_add_at_end(LinkedList this, void *data);
-bool LinkedList_contains(const LinkedList this, void *data);
-void LinkedList_remove(LinkedList this, void *data);
+void LinkedList_add_at_end(LinkedList this, char *data);
+bool LinkedList_contains(const LinkedList this, char *data);
+void LinkedList_remove(LinkedList this, char *data);
 void* LinkedList_elementAt(LinkedList this, int index);
 void print_List(LinkedList this);
