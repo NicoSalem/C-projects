@@ -1,4 +1,5 @@
 #include "LinkedList.h"
+#include "main.h"
 
 LinkedList new_LinkedList()
 {
@@ -80,12 +81,21 @@ void LinkedList_add_at_end(LinkedList this, char *data) {
 
 bool LinkedList_contains(const LinkedList this, char *data) {
     for (Node node=this->first; node != NULL; node=node->next) {
-        if (node->data == data) {
+        if (compareStrings(node->data,data)) {
             return true;
         }
     }
     return false;
 }
+
+// bool LinkedList_contains(const LinkedList this, char *data) {
+//     for (Node node=this->first; node != NULL; node=node->next) {
+//         if (node->data == data) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
 
 void print_List(LinkedList this)
 {
@@ -98,5 +108,3 @@ void print_List(LinkedList this)
     }
     while(current!=NULL);
 }
-
-

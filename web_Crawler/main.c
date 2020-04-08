@@ -4,56 +4,111 @@
 #include <unistd.h>
 #include <string.h>
 #include <netdb.h>
-
 #include "LinkedList.c"
-#include "main.h"
+
+//#include "main.h"
 
 
 int main(int argc, char *argv[])
 {
-
-//    get_href("<a href=\"/intl/pt-BR/policies/privacy/\">Privacidade</a>");
-    HTML_pages = new_LinkedList();
-    a_tags = new_LinkedList();
+    visited_urls = new_LinkedList();
     href_list = new_LinkedList();
 
-    char *initialPage;
-    initialPage = argv[1];
+    //char *nick = "";
+    
+    currentPage1 = argv[1];
 
-    char *response = socket_TCP_HTTP(initialPage);
+    rec(currentPage1);
 
-    get_a_tags(response);
-    print_List(a_tags);
-
-    Node current = a_tags->first;
-    while(current->next!=NULL)
+    if(href_list->first != NULL)
     {
-        get_href(current->data);
-        current = current->next;
-    }
-    print_List(href_list);
+        print_List(href_list);
+        Node current = href_list->first;
+        printf("\ncurrent->data1:\n%s\n\n",current->data);
+        int cont = 0;
 
+        while(current->next!=NULL);
+        {
+            printf("\niteration number:\n%d\n\n",cont);    
+            printf("\ncurrent->data1:\n%s\n\n",current->data);
+            if(cont>=200){break;}
+            currentPage1 = current->data;
+            printf("\nHREF LIST\n");
+            print_List(href_list);
+
+            printf("\nVISITED URL LIST\n");
+            print_List(visited_urls);
+    
+            if(LinkedList_contains(visited_urls,current->data))
+            {
+                printf("\nALREADY VISITED \n");
+                current = current->next;
+                LinkedList_remove(href_list, current->prev->data);
+            }
+            else
+            {
+                printf("\nFIRST VISIT\n");
+                //check if url is valid
+                if(current->data[0]=='h'&&current->data[1]=='t'&&current->data[2]=='t'&&
+                current->data[3]=='p'&&current->data[4]=='s'){current = current->next;
+                cont++;current=current->next;}
+
+                currentPage1 = current->data;
+                LinkedList_add_at_end(href_list, currentPage1);
+                rec(currentPage1);
+                
+                current = current->next;
+                LinkedList_remove(href_list, current->prev->data);
+                cont++;
+            }       
+        }
+    }
+
+    printf("\nLAST HREF LIST\n");
+    print_List(href_list);
+    printf("\n\nthe end\n");
 	return 0;
+}
+
+void rec(char *currentPage)
+{
+    printf("\ninside rec\n");
+
+    currentPage1 = currentPage;
+    char *response = socket_TCP_HTTP(currentPage1);
+
+    LinkedList_add_at_end(visited_urls,currentPage1);
+    get_a_tags(response);
+
+    printf("\nend rec\n");
 }
 
 char *socket_TCP_HTTP(char *server)
 {
+    printf("\ninside socket\n");
     int sock = 0;
     long valread;
     struct sockaddr_in serv_addr;
-    char *get = "GET / HTTP/1.1\n";
-    char *host = "Host: ";
+    char *gettxt = "GET ";
+    char *get_path = getPath_fromURL(server);
+    char * httptxt = " HTTP/1.1\n";
+    char *hosttxt = "Host: ";
+    char *host = getHost_fromURL(server);
+    // printf("HOST: %s\n",host);
     char *close = "\nConnection: close\n\n";
 
-    char *request = malloc(strlen(get)+strlen(host)+strlen(server)+strlen(close)+1);
-    strcpy(request, get);
-    strcat(request,host);
-    strcat(request,server);
-    strcat(request,close);
+    char *request = malloc(strlen(gettxt)+strlen(get_path)+strlen(httptxt)+strlen(hosttxt)+strlen(host)+strlen(close)+1000);
+    //char *request = malloc(strlen(get)+strlen(close)+1);
+    strcpy(request, gettxt);
+    strcat(request, get_path);
+    strcat(request, httptxt);
+    strcat(request, hosttxt);
+    strcat(request, host);
+    strcat(request, close);
 
-    printf("%s",request);
+    printf("\nREQUEST:\n%s\n",request);
 
-    char buffer[1000] = {0};
+    char buffer[100000] = {0};
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         printf("\n Socket creation error \n");
@@ -62,7 +117,7 @@ char *socket_TCP_HTTP(char *server)
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
-    serv_addr.sin_addr.s_addr = inet_addr(getHostIP(server));
+    serv_addr.sin_addr.s_addr = inet_addr(getHostIP(host));
 
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
     {
@@ -79,12 +134,11 @@ char *socket_TCP_HTTP(char *server)
     {
         response = realloc(response, (i* sizeof(buffer))+2);
         strcat(response,buffer);
-        //printf("%s\n",buffer);
         i++;
-
     }
-//    fclose(filePointer);
-    printf("response: %s",response);
+
+    //printf("\nRESPONSE:\n%s\nEND OF RESPONSE\n",response);
+
     return response;
 }
 
@@ -101,21 +155,22 @@ char *getHostIP(char *hostname)
         exit(1);
     }
 // print information about this host:
-    printf("Official name is: %s\n", he->h_name);
-    printf("IP address: %s\n", inet_ntoa(*(struct in_addr*)he->h_addr));
+    // printf("Official name is: %s\n", he->h_name);
+    // printf("IP address: %s\n", inet_ntoa(*(struct in_addr*)he->h_addr));
     char *ip = inet_ntoa(*(struct in_addr*)he->h_addr);
-    printf("All addresses: ");
+    //printf("All addresses: ");
     addr_list = (struct in_addr **)he->h_addr_list;
     for(i = 0; addr_list[i] != NULL; i++) {
-        printf("%s ", inet_ntoa(*addr_list[i]));
+        //printf("%s ", inet_ntoa(*addr_list[i]));
     }
-    printf("\n");
+    //printf("\n");
 
     return ip;
 }
 
 void get_a_tags(char *htmlpage)
 {
+    printf("\ninside a\n");
     for(int c=0; c<strlen(htmlpage);c++)
     {
         if(htmlpage[c]=='<')
@@ -126,7 +181,7 @@ void get_a_tags(char *htmlpage)
                 strcpy(a_tag, "");
                 int n = 1;
                 bool keepGoing = true;
-                do
+                while(keepGoing)
                 {
                     a_tag = realloc(a_tag, (n* sizeof(char)+10));
                     char ch[2];
@@ -143,41 +198,62 @@ void get_a_tags(char *htmlpage)
                     }
                     n++; c++;
                 }
-                while(keepGoing);
-//                get_href(a_tag);
-//                printf("a tag: %s\n",a_tag);
-               LinkedList_add_at_end(a_tags,a_tag);
-
+                char *hr = get_href(a_tag);
+                currentLink = hr;
+                //printf("does hreflist contain %s: %d\n",currentLink,LinkedList_contains(href_list,currentLink));
+                if(hr!="badForm" && !(LinkedList_contains(href_list,currentLink))){LinkedList_add_at_end(href_list,currentLink);}
             }
         }
     }
-//    free(a_tag);
+    printf("\nend a\n");
 }
 
-void get_href(char *tag)
+char *get_href(char *tag)
 {
-    char *href = malloc(1);
+    printf("\ninside href\n");
+    char *href = malloc(3);
     strcpy(href, "");
     int n = 1;
+    bool iswellFormatted = true;
 
     for(int co=0; co<strlen(tag);co++)
     {
         if(tag[co]=='h' && tag[co+1]=='r' && tag[co+2]=='e' && tag[co+3]=='f')
         {
-
             int cc = co+6;
             while(true)
             {
-                if(tag[cc]=='\"'){break;}
+                if(tag[cc]=='\"' || cc>=1000){break;}
+                if(cc>=1000){iswellFormatted = false; break;}
                 href = realloc(href, (n* sizeof(char)+3));
                 char ch[2];
                 ch[0] = tag[cc]; ch[1]='\0';
                 strcat(href, ch);
-                cc++;
+                cc++; n++;
             }
         }
     }
-    //printf("href: %s\n",href);
-    LinkedList_add_at_end(href_list,href);
-//    free(href);
+    if(n==1){return "badForm";}
+    if(iswellFormatted==true)
+    {       
+        char *rootURL = malloc(3);
+        rootURL = realloc(rootURL,strlen(currentPage1)+strlen(href)+1000);
+        strcpy(rootURL,"");
+        if(href[0]=='/')
+        {   
+            int c=1;
+            for(c; c<strlen(currentPage1); c++)
+            {
+                if(currentPage1[c]=='/'&&currentPage1[c-1]=='/' && currentPage1[c-1]!=':'){ break;}
+            }
+            for(int i=0; i<c; i++)
+            {
+                rootURL[i]=currentPage1[i];
+            }
+        }
+        strcat(rootURL, href);
+        return rootURL;
+    }
+    return "badForm";
+    
 }
